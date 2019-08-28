@@ -486,8 +486,6 @@ function blizzard_query(filter)
         class_index = info.item_class_index(item_info.class)
         subclass_index = info.item_subclass_index(class_index or 0, item_info.subclass)
         slot_index = info.item_slot_index(class_index or 0, subclass_index or 0, item_info.slot)
-    end
-    if item_info then
         query.min_level = item_info.level
         query.max_level = item_info.level
         query.usable = item_info.usable
