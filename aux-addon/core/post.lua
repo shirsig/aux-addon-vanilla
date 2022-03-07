@@ -33,37 +33,6 @@ function process()
 	return stop()
 end
 
-function post_auction2(slot, k)
-	local item_info = info.container_item(unpack(slot))
-	if item_info.item_key == state.item_key and info.auctionable(item_info.tooltip, nil, true) and item_info.aux_quantity == state.stack_size then
-
-		ClearCursor()
-		ClickAuctionSellItemButton()
-		ClearCursor()
-		PickupContainerItem(unpack(slot))
-		ClickAuctionSellItemButton()
-		ClearCursor()
-
-		StartAuction(max(1, aux.round(state.unit_start_price * item_info.aux_quantity)), aux.round(state.unit_buyout_price * item_info.aux_quantity), state.duration)
-
-		local send_signal, signal_received = aux.signal()
-		aux.when(signal_received, function()
-			state.posted = state.posted + 1
-			return k()
-		end)
-
-		local posted
-		aux.event_listener('CHAT_MSG_SYSTEM', function(kill)
-			if arg1 == ERR_AUCTION_STARTED then
-				send_signal()
-				kill()
-			end
-		end)
-	else
-		return stop()
-	end
-end
-
 function post_auction(slot, k)
 	local item_info = info.container_item(unpack(slot))
 	if item_info.item_key == state.item_key and info.auctionable(item_info.tooltip, nil, true) and item_info.aux_quantity == state.stack_size then
@@ -77,37 +46,52 @@ function post_auction(slot, k)
 		
 		local start_price = state.unit_start_price
 		local buyout_price = state.unit_buyout_price
-		local kz_undercut = 0
+		local kz_daily = 0
+		local kz_pricing = 0
 		
+		--use autoprice heuristic if start bid 0 is set
 		if start_price == 0 then
 			
+			if buyout_price > 0 then
+				kz_pricing=1
+			end
+			
 			if history.market_value(state.item_key) ~= nil then 
-					start_price = max(start_price,0.93*tonumber(history.market_value(state.item_key)))
-					buyout_price = max(buyout_price,0.99*tonumber(history.market_value(state.item_key)))
-					
-					kz_undercut = 1
+					local tmp = tonumber(history.market_value(state.item_key))
+					tmp = max(0.99*tmp,tmp-50)
+					buyout_price = max(buyout_price,tmp)
+					kz_daily = 1
 			end	
 			
 			if disenchant.value(item_info.slot, item_info.quality, item_info.level) ~= nil then 
-				buyout_price = max(buyout_price,0.80* tonumber(disenchant.value(item_info.slot, item_info.quality, item_info.level)))
+				buyout_price = max(buyout_price,0.85* tonumber(disenchant.value(item_info.slot, item_info.quality, item_info.level)))
 			end
 					
-			if aux.account_data.merchant_sell[item_info.item_id] ~= nil then 
-				start_price = max(start_price,tonumber(aux.account_data.merchant_sell[item_info.item_id]) * 1.35)
-				buyout_price = max(buyout_price,start_price)
-			
-				if kz_undercut == 0 then
+			if aux.account_data.merchant_sell[item_info.item_id] ~= nil then 		
+				if kz_daily == 0 then
 					start_price = max(start_price,tonumber(aux.account_data.merchant_sell[item_info.item_id]) * (1.35+3.65*math.exp(-(1/4000)* tonumber(aux.account_data.merchant_sell[item_info.item_id] ))))
+					buyout_price = max(buyout_price,start_price)
+				else
+					start_price = max(start_price,tonumber(aux.account_data.merchant_sell[item_info.item_id]) * 1.35)
 					buyout_price = max(buyout_price,start_price)
 				end
 			end
 			
+			if aux.account_data.merchant_buy[item_info.item_id] ~= nil then 
+				local tmp = tostring(aux.account_data.merchant_buy[item_info.item_id])
+				tmp = strsub(tmp,1,-3)
+				start_price = max(start_price,tonumber(tmp) * 1.1)
+				buyout_price = max(buyout_price,tonumber(tmp) * 1.15)
+			end
+			
 			if history.value(state.item_key) ~= nil then 
-				start_price = max(start_price,0.89*tonumber(history.value(state.item_key)))
-				buyout_price = max(buyout_price,0.89*tonumber(history.value(state.item_key)))
-				
-				if kz_undercut == 0 then
-					buyout_price = max(buyout_price,1.0* tonumber(history.value(state.item_key)))
+				if kz_pricing == 1 and kz_daily == 1 then
+					buyout_price = max(buyout_price,1.0*tonumber(history.value(state.item_key)))
+				elseif kz_daily == 1 then
+					start_price = max(start_price,0.91*tonumber(history.value(state.item_key)))
+					buyout_price = max(buyout_price,0.91*tonumber(history.value(state.item_key)))
+				else
+					buyout_price = max(buyout_price,0.99* tonumber(history.value(state.item_key)))
 				end
 			end
 			

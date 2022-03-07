@@ -51,4 +51,6 @@ tabs\bids\frame.lua
 
 core\crafting.lua
 
+localization.lua
+
 
