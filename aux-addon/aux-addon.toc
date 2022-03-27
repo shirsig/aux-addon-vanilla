@@ -1,5 +1,6 @@
 ## Interface: 11200
 ## Author: shirsig
+## OptionalDeps: ShaguTweaks
 ## Title: aux
 ## Notes: Auction House replacement
 ## SavedVariables: aux

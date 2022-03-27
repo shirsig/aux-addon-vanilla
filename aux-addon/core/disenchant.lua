@@ -33,21 +33,30 @@ local WEAPON = T.set(
 	'INVTYPE_RANGEDRIGHT'
 )
 
-function M.value(slot, quality, level)
+function M.value(slot, quality, level, item_id)
     local expectation
-    for _, event in distribution(slot, quality, level) do
+    for _, event in distribution(slot, quality, level, item_id) do
         local value = history.value(event.item_id .. ':' .. 0)
-        if not value then
+		if not value then
             return
         else
+			local value_today = history.market_value(event.item_id .. ':' .. 0)
+			if value_today then
+				value=min(value,value_today)
+			end
             expectation = (expectation or 0) + event.probability * (event.min_quantity + event.max_quantity) / 2 * value
         end
     end
     return expectation
 end
 
-function M.distribution(slot, quality, level)
-    if not ARMOR[slot] and not WEAPON[slot] or level == 0 then
+function M.distribution(slot, quality, level, item_id)
+    if not ARMOR[slot] and not WEAPON[slot] or level == 0 
+	--twillight cultist items are not disenchantable
+	or item_id==20408 or item_id==20407 or item_id==20406 
+	--enchanting created wands are not disenchantable
+	or item_id==11288 or item_id==11290 or item_id==11287 or item_id==11289 
+	then
         return T.acquire()
     end
 

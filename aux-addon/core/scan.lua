@@ -147,11 +147,11 @@ function scan_page(i)
 
 		history.process_auction(auction_info)
 		
-		if (get_state().params.auto_bid_validator or pass)(auction_info) then
+		if (get_state().params.auto_bid_validator or pass)(auction_info) and auction_info.owner ~= UnitName("player") then
 			local send_signal, signal_received = aux.signal()
 			aux.when(signal_received, scan_page, i)
 			return aux.place_bid(auction_info.query_type, auction_info.index, auction_info.bid_price, send_signal)
-		elseif (get_state().params.auto_buy_validator or pass)(auction_info) then
+		elseif (get_state().params.auto_buy_validator or pass)(auction_info) and auction_info.owner ~= UnitName("player") then
 			local send_signal, signal_received = aux.signal()
 			aux.when(signal_received, scan_page, i)
 			return aux.place_bid(auction_info.query_type, auction_info.index, auction_info.buyout_price, send_signal)
