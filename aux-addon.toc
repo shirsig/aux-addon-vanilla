@@ -1,5 +1,6 @@
 ## Interface: 11200
 ## Author: shirsig
+## OptionalDeps: ShaguTweaks
 ## Title: aux
 ## Notes: Auction House replacement
 ## SavedVariables: aux
@@ -50,5 +51,7 @@ tabs\bids\core.lua
 tabs\bids\frame.lua
 
 core\crafting.lua
+
+localization.lua
 
 

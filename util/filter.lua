@@ -110,6 +110,16 @@ M.filters = {
             end
         end
     },
+	
+	['bid-disenchant-percent'] = {
+        input_type = 'number',
+        validator = function(pct)
+            return function(auction_record)
+                return disenchant.value(auction_record.slot, auction_record.quality, auction_record.level, auction_record.item_id)
+				and auction_record.unit_bid_price / disenchant.value(auction_record.slot, auction_record.quality, auction_record.level, auction_record.item_id) * 100 <= pct
+            end
+        end
+    },
 
     ['percent'] = {
         input_type = 'number',
@@ -118,6 +128,17 @@ M.filters = {
                 return auction_record.unit_buyout_price > 0
                         and history.value(auction_record.item_key)
                         and auction_record.unit_buyout_price / history.value(auction_record.item_key) * 100 <= pct
+            end
+        end
+    },
+				
+	['disenchant-percent'] = {
+        input_type = 'number',
+        validator = function(pct)
+            return function(auction_record)
+                return auction_record.unit_buyout_price > 0
+                        and disenchant.value(auction_record.slot, auction_record.quality, auction_record.level, auction_record.item_id)
+                        and auction_record.unit_buyout_price / disenchant.value(auction_record.slot, auction_record.quality, auction_record.level, auction_record.item_id) * 100 <= pct
             end
         end
     },
@@ -144,8 +165,8 @@ M.filters = {
         input_type = 'money',
         validator = function(amount)
             return function(auction_record)
-                local disenchant_value = disenchant.value(auction_record.slot, auction_record.quality, auction_record.level)
-                return disenchant_value and disenchant_value - auction_record.bid_price >= amount
+                local disenchant_value = disenchant.value(auction_record.slot, auction_record.quality, auction_record.level, auction_record.item_id)
+				return disenchant_value and disenchant_value - auction_record.bid_price >= amount
             end
         end
     },
@@ -154,8 +175,8 @@ M.filters = {
         input_type = 'money',
         validator = function(amount)
             return function(auction_record)
-                local disenchant_value = disenchant.value(auction_record.slot, auction_record.quality, auction_record.level)
-                return auction_record.buyout_price > 0 and disenchant_value and disenchant_value - auction_record.buyout_price >= amount
+                local disenchant_value = disenchant.value(auction_record.slot, auction_record.quality, auction_record.level, auction_record.item_id)
+				return auction_record.buyout_price > 0 and disenchant_value and disenchant_value - auction_record.buyout_price >= amount
             end
         end
     },
@@ -165,6 +186,16 @@ M.filters = {
         validator = function(amount)
             return function(auction_record)
                 local vendor_price = info.merchant_info(auction_record.item_id)
+				if not vendor_price then 
+				    vendor_price = ShaguTweaks.SellValueDB[auction_record.item_id]
+					if vendor_price then 
+						local charges = 1
+						if info.max_item_charges(auction_record.item_id) ~= nil then 
+							info.charges=info.max_item_charges(auction_record.item_id) 
+						end
+						vendor_price= vendor_price/ charges 
+					 end
+				end
                 return vendor_price and vendor_price * auction_record.aux_quantity - auction_record.bid_price >= amount
             end
         end
@@ -175,6 +206,16 @@ M.filters = {
         validator = function(amount)
             return function(auction_record)
                 local vendor_price = info.merchant_info(auction_record.item_id)
+				if not vendor_price then 
+				    vendor_price = ShaguTweaks.SellValueDB[auction_record.item_id]
+					if vendor_price then 
+						local charges = 1
+						if info.max_item_charges(auction_record.item_id) ~= nil then 
+							info.charges=info.max_item_charges(auction_record.item_id) 
+						end
+						vendor_price= vendor_price/ charges 
+					 end
+				end
                 return auction_record.buyout_price > 0 and vendor_price and vendor_price * auction_record.aux_quantity - auction_record.buyout_price >= amount
             end
         end

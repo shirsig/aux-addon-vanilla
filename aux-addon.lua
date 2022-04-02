@@ -58,7 +58,7 @@ function handle.LOAD()
         ignore_owner = true,
         crafting_cost = true,
         post_bid = false,
-        post_duration = post.DURATION_8,
+        post_duration = post.DURATION_24,
         items = {},
         item_ids = {},
         auctionable_items = {},

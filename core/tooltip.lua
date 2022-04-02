@@ -54,7 +54,7 @@ function M.extend_tooltip(tooltip, link, quantity)
     quantity = IsShiftKeyDown() and quantity or 1
     local item_info = T.temp-info.item(item_id)
     if item_info then
-        local distribution = disenchant.distribution(item_info.slot, item_info.quality, item_info.level)
+        local distribution = disenchant.distribution(item_info.slot, item_info.quality, item_info.level, item_id)
         if getn(distribution) > 0 then
             if settings.disenchant_distribution then
                 tooltip:AddLine('Disenchants into:', aux.color.tooltip.disenchant.distribution())
@@ -64,7 +64,7 @@ function M.extend_tooltip(tooltip, link, quantity)
                 end
             end
             if settings.disenchant_value then
-                local disenchant_value = disenchant.value(item_info.slot, item_info.quality, item_info.level)
+                local disenchant_value = disenchant.value(item_info.slot, item_info.quality, item_info.level, item_id)
                 tooltip:AddLine('Disenchant: ' .. (disenchant_value and money.to_string2(disenchant_value) or UNKNOWN), aux.color.tooltip.disenchant.value())
             end
         end
@@ -77,6 +77,13 @@ function M.extend_tooltip(tooltip, link, quantity)
     end
     if settings.merchant_sell then
         local price = info.merchant_info(item_id)
+		if price == nil and ShaguTweaks.SellValueDB[item_id] ~= nil then
+			local charges = 1
+			if info.max_item_charges(item_id) ~= nil then 
+				charges=info.max_item_charges(item_id) 
+			end
+			price = ShaguTweaks.SellValueDB[item_id] / charges
+		end
         if price ~= 0 then
             tooltip:AddLine('Vendor: ' .. (price and money.to_string2(price * quantity) or UNKNOWN), aux.color.tooltip.merchant())
         end
