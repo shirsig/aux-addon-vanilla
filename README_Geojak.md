@@ -8,3 +8,5 @@
 8. new filter disenchant-percent and bid-disencahnt-percent
 9. enchanting created wands are not encahntabke, same with twillight stuff at 5. reworked implementation for easier addition
 10. disenchant values are calcualted from min(value,value_today), this protects users from low enchanting mat prices
+11. advanced trade skill menu compabillity to display aux crafting cost
+12. changed default post duration from 8 to 24, since turtle wow got no fees anyway
