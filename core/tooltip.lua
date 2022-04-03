@@ -77,7 +77,7 @@ function M.extend_tooltip(tooltip, link, quantity)
     end
     if settings.merchant_sell then
         local price = info.merchant_info(item_id)
-		if price == nil and ShaguTweaks.SellValueDB[item_id] ~= nil then
+		if price == nil and ShaguTweaks and ShaguTweaks.SellValueDB[item_id] ~= nil then
 			local charges = 1
 			if info.max_item_charges(item_id) ~= nil then 
 				charges=info.max_item_charges(item_id) 
