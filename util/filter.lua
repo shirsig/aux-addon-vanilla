@@ -186,7 +186,7 @@ M.filters = {
         validator = function(amount)
             return function(auction_record)
                 local vendor_price = info.merchant_info(auction_record.item_id)
-				if not vendor_price then 
+				if not vendor_price and ShaguTweaks then 
 				    vendor_price = ShaguTweaks.SellValueDB[auction_record.item_id]
 					if vendor_price then 
 						local charges = 1
@@ -206,7 +206,7 @@ M.filters = {
         validator = function(amount)
             return function(auction_record)
                 local vendor_price = info.merchant_info(auction_record.item_id)
-				if not vendor_price then 
+				if not vendor_price and ShaguTweaks then 
 				    vendor_price = ShaguTweaks.SellValueDB[auction_record.item_id]
 					if vendor_price then 
 						local charges = 1

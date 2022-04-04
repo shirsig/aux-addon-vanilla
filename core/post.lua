@@ -91,7 +91,7 @@ function post_auction(slot, k)
 				local vendor_price = 0
 				if aux.account_data.merchant_sell[item_info.item_id] ~= nil then 		
 					vendor_price = tonumber(aux.account_data.merchant_sell[item_info.item_id])
-				elseif ShaguTweaks.SellValueDB[item_info.item_id] ~= nil then
+				elseif ShaguTweaks and ShaguTweaks.SellValueDB[item_info.item_id] ~= nil then
 					local charges = 1
 					if info.max_item_charges(item_info.item_id) ~= nil then 
 						charges=info.max_item_charges(item_info.item_id) 
