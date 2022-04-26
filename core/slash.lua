@@ -21,6 +21,9 @@ function SlashCmdList.AUX(command)
     elseif arguments[1] == 'ignore' and arguments[2] == 'owner' then
 	    aux.account_data.ignore_owner = not aux.account_data.ignore_owner
         aux.print('ignore owner ' .. status(aux.account_data.ignore_owner))
+	elseif arguments[1] == 'post' and arguments[2] == 'stack' then
+        aux.account_data.post_stack = not aux.account_data.post_stack
+	    aux.print('post stack ' .. status(aux.account_data.post_stack))
     elseif arguments[1] == 'post' and arguments[2] == 'bid' then
         aux.account_data.post_bid = not aux.account_data.post_bid
 	    aux.print('post bid ' .. status(aux.account_data.post_bid))
@@ -61,6 +64,7 @@ function SlashCmdList.AUX(command)
 		aux.print('- ignore owner [' .. status(aux.account_data.ignore_owner) .. ']')
 		aux.print('- post bid [' .. status(aux.account_data.post_bid) .. ']')
         aux.print('- post duration [' .. aux.color.blue(aux.account_data.post_duration / 60 .. 'h') .. ']')
+		aux.print('- post stack [' .. status(aux.account_data.post_stack) .. ']')
         aux.print('- crafting cost [' .. status(aux.account_data.crafting_cost) .. ']')
 		aux.print('- tooltip value [' .. status(tooltip_settings.value) .. ']')
 		aux.print('- tooltip daily [' .. status(tooltip_settings.daily) .. ']')
