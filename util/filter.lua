@@ -38,7 +38,7 @@ M.filters = {
             return default_filter(str).validator()
         end,
     },
-
+	
     ['item'] = {
         input_type = 'string',
         validator = function(name)
@@ -229,6 +229,16 @@ M.filters = {
             end
         end
     },
+	
+	['isgear'] = {
+		input_type = '',
+        validator = function()
+            return function(auction_record)
+                return not(info.item(auction_record.item_id).slot == '')
+            end
+        end,
+	    },
+	
 }
 
 function operator(str)

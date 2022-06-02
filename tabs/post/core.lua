@@ -431,23 +431,28 @@ function update_item(item)
     UIDropDownMenu_SetSelectedValue(duration_dropdown, settings.duration)
 
     hide_checkbox:SetChecked(settings.hidden)
+	
 	local ii = 1
-    if selected_item.max_charges then
-	    for i = selected_item.max_charges, 1, -1 do
+	if selected_item.max_charges then
+		for i = selected_item.max_charges, 1, -1 do
 			if selected_item.availability[i] > 0 then
 				stack_size_slider:SetMinMaxValues(1, i)
 				ii=i
 				break
 			end
-	    end
-    else
+		end
+	else
 		ii = min(selected_item.max_stack, selected_item.aux_quantity)
-	    stack_size_slider:SetMinMaxValues(1, min(selected_item.max_stack, selected_item.aux_quantity))
-    end
-	
-	stack_size_slider:SetValue(math.random(1,ii))
-    --stack_size_slider:SetValue(aux.huge)
-	--stack_size_slider:SetValue(1)
+		stack_size_slider:SetMinMaxValues(1, min(selected_item.max_stack, selected_item.aux_quantity))
+	end
+		
+	if not aux.account_data.post_stack then	
+		stack_size_slider:SetValue(math.random(1,ii))
+	else
+		stack_size_slider:SetValue(aux.huge)
+		--stack_size_slider:SetValue(1)
+	end
+
     quantity_update(true)
 
     unit_start_price_input:SetText(money.to_string(settings.start_price, true, nil, nil, true))
