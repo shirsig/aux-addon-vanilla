@@ -144,16 +144,17 @@ function scan_page(i)
 		auction_info.page = get_state().page
 		auction_info.blizzard_query = get_query().blizzard_query
 		auction_info.query_type = get_state().params.type
-
+		
 		history.process_auction(auction_info)
-		if (get_state().params.auto_bid_validator or pass)(auction_info) and auction_info.owner ~= UnitName("player") and auction_info.high_bidder == nil then
-			local send_signal, signal_received = aux.signal()
-			aux.when(signal_received, scan_page, i)
-			return aux.place_bid(auction_info.query_type, auction_info.index, auction_info.bid_price, send_signal)
-		elseif (get_state().params.auto_buy_validator or pass)(auction_info) and auction_info.owner ~= UnitName("player") then
+		
+		if (get_state().params.auto_buy_validator or pass)(auction_info) and auction_info.buyout_price >0 and auction_info.owner ~= UnitName("player") then
 			local send_signal, signal_received = aux.signal()
 			aux.when(signal_received, scan_page, i)
 			return aux.place_bid(auction_info.query_type, auction_info.index, auction_info.buyout_price, send_signal)
+		elseif (get_state().params.auto_bid_validator or pass)(auction_info) and auction_info.owner ~= UnitName("player") and auction_info.high_bidder == nil then
+			local send_signal, signal_received = aux.signal()
+			aux.when(signal_received, scan_page, i)
+			return aux.place_bid(auction_info.query_type, auction_info.index, auction_info.bid_price, send_signal)
 		elseif not get_query().validator or get_query().validator(auction_info) then
 			do (get_state().params.on_auction or pass)(auction_info) end
 		end
