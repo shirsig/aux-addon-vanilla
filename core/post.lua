@@ -53,6 +53,7 @@ function post_auction(slot, k)
 			local kz_daily = 0
 			local kz_pricing = 0
 			local kz_warn = 0
+			local vendor_price = 0
 		
 			if buyout_price > 0 then
 				kz_pricing=1
@@ -61,25 +62,26 @@ function post_auction(slot, k)
 			
 			if history.market_value(state.item_key) ~= nil then 
 					local tmp = tonumber(history.market_value(state.item_key))
-					tmp = max(0.99*tmp,tmp-50)
+					--tmp = max(0.99*tmp,tmp-50)
+					--buyout_price = max(buyout_price,tmp)
+					tmp = max(1,tmp-1)
 					buyout_price = max(buyout_price,tmp)
 					kz_daily = 1
 			end	
 			
 			if history.value(state.item_key) ~= nil then 
 				if kz_pricing == 1 and kz_daily == 1 then
-					buyout_price = max(buyout_price,1.0*tonumber(history.value(state.item_key)))
+					--buyout_price = max(buyout_price,0.99*tonumber(history.value(state.item_key)))
+					buyout_price = max(buyout_price,0.50*tonumber(history.value(state.item_key)))
 				elseif kz_daily == 1 then
-					start_price = max(start_price,0.91*tonumber(history.value(state.item_key)))
+					--start_price = max(start_price,0.91*tonumber(history.value(state.item_key
+					start_price = max(start_price,0.80*tonumber(history.value(state.item_key)))
 				else
-					buyout_price = max(buyout_price,0.99* tonumber(history.value(state.item_key)))
+					--buyout_price = max(buyout_price,0.99* tonumber(history.value(state.item_key)))
+					buyout_price = max(buyout_price,0.95* tonumber(history.value(state.item_key)))
 				end
 			else
 				kz_warn = kz_warn + 1
-			end
-			
-			if disenchant.value(item_info.slot, item_info.quality, item_info.level, item_info.item_id) ~= nil then 
-				start_price = max(start_price,0.85* tonumber(disenchant.value(item_info.slot, item_info.quality, item_info.level, item_info.item_id)))
 			end
 			
 			if aux.account_data.merchant_buy[item_info.item_id] ~= nil then 
@@ -88,7 +90,6 @@ function post_auction(slot, k)
 				start_price = max(start_price,tonumber(tmp) * 1.1)
 				buyout_price = max(buyout_price,tonumber(tmp) * 1.15)		
 			else 
-				local vendor_price = 0
 				if aux.account_data.merchant_sell[item_info.item_id] ~= nil then 		
 					vendor_price = tonumber(aux.account_data.merchant_sell[item_info.item_id])
 				elseif ShaguTweaks and ShaguTweaks.SellValueDB[item_info.item_id] ~= nil then
@@ -100,7 +101,7 @@ function post_auction(slot, k)
 				end
 				if vendor_price	> 0 then
 					if kz_daily == 0 then
-					start_price = max(start_price, vendor_price * (1.35+3.65*math.exp(-(1/4000)* vendor_price)))
+						start_price = max(start_price, vendor_price * (1.35+3.65*math.exp(-(1/4000)* vendor_price)))
 					else
 						start_price = max(start_price, vendor_price * 1.35)
 					end
@@ -109,14 +110,31 @@ function post_auction(slot, k)
 				end
 			end
 			
+			if disenchant.value(item_info.slot, item_info.quality, item_info.level, item_info.item_id) ~= nil then 
+				start_price = max(start_price,0.85* tonumber(disenchant.value(item_info.slot, item_info.quality, item_info.level, item_info.item_id)))
+			end
+			
 			start_price = max(start_price,0.91 * buyout_price)
 			buyout_price = max(start_price, buyout_price)
 			
-			if kz_warn == 2 and kz_pricing == 0 then
-				print("WARNING, insufficient data for autopricing!")
-				if start_price == 0 then 
+			if disenchant.value(item_info.slot, item_info.quality, item_info.level, item_info.item_id) ~= nil then 
+				if buyout_price < 0.95 * tonumber(disenchant.value(item_info.slot, item_info.quality, item_info.level, item_info.item_id)) -30 then
+					print("AUX: autopricing recommends disenchanting!")
 					return stop()
 				end
+			end
+			
+			if kz_daily == 1 and vendor_price > 0 then 
+				if tonumber(history.value(state.item_key)) < 1.35 * vendor_price 
+				or tonumber(history.market_value(state.item_key)) < 1.35 * vendor_price then
+					print("AUX: autopricing recommends vendoring!")
+					return stop()
+				end
+			end
+			
+			if start_price == 0 or (kz_warn == 2 and kz_pricing == 0) then
+				print("AUX: insufficient data for autopricing!")
+				return stop()
 			end
 			
 			local gold = floor(start_price / COPPER_PER_GOLD)

@@ -11,3 +11,6 @@
 11. advanced trade skill menu compabillity to display aux crafting cost
 12. changed default post duration from 8 to 24, since turtle wow got no fees anyway
 13. new filter "isgear" which can be used to generic filter out all white and green armor and weapons that have incosinstent market value
+14. made ah data crossfaction on the server "Turtle WoW" (all chars are considered horde)
+15. fixed a bug with the auto bid, bidding yoursefl up
+16. adjusted the auto pricing to not post items and instead pprint a warning if it things its not profitable

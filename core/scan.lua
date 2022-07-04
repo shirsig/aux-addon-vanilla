@@ -146,8 +146,7 @@ function scan_page(i)
 		auction_info.query_type = get_state().params.type
 
 		history.process_auction(auction_info)
-		
-		if (get_state().params.auto_bid_validator or pass)(auction_info) and auction_info.owner ~= UnitName("player") then
+		if (get_state().params.auto_bid_validator or pass)(auction_info) and auction_info.owner ~= UnitName("player") and auction_info.high_bidder == nil then
 			local send_signal, signal_received = aux.signal()
 			aux.when(signal_received, scan_page, i)
 			return aux.place_bid(auction_info.query_type, auction_info.index, auction_info.bid_price, send_signal)
