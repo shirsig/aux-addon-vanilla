@@ -14,3 +14,5 @@
 14. made ah data crossfaction on the server "Turtle WoW" (all chars are considered horde)
 15. fixed a bug with the auto bid, bidding yoursefl up
 16. adjusted the auto pricing to not post items and instead pprint a warning if it things its not profitable
+17. percentage pricing, do 1g 10s 50% or 100% 50s which will calc a price as max( % * market_value, gold silver copper), the calc vlaue is then saved
+18. if you use the aux post bid mode, then clicking a buyout to undercut will not adjust the starting bid price aswell
