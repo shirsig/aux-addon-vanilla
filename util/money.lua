@@ -2,6 +2,7 @@ module 'aux.util.money'
 
 local T = require 'T'
 local aux = require 'aux'
+local history = require 'aux.core.history'
 
 M.GOLD_TEXT = '|cffffd70ag|r'
 M.SILVER_TEXT = '|cffc7c7cfs|r'
@@ -17,7 +18,7 @@ function M.to_gsc(money)
 	return gold, silver, copper
 end
 
-function M.from_gsc(gold, silver, copper)
+function M.from_gsc(gold, silver, copper, percent)
 	return gold * COPPER_PER_GOLD + silver * COPPER_PER_SILVER + copper
 end
 
@@ -100,25 +101,38 @@ function M.to_string(money, pad, trim, color, no_color)
 	return text
 end
 
-function M.from_string(value)
+function M.from_string(value, item_id)
 	local number = tonumber(value)
+	
 	if number and number >= 0 then
 		return number * COPPER_PER_GOLD
 	end
 
 	value = gsub(gsub(strlower(value), '|c%x%x%x%x%x%x%x%x', ''), FONT_COLOR_CODE_CLOSE, '')
-
+	
+	local percent = tonumber(aux.select(3, strfind(value, '(%d*%.?%d+)%%')))
 	local gold = tonumber(aux.select(3, strfind(value, '(%d*%.?%d+)g')))
 	local silver = tonumber(aux.select(3, strfind(value, '(%d*%.?%d+)s')))
 	local copper = tonumber(aux.select(3, strfind(value, '(%d*%.?%d+)c')))
-	if not gold and not silver and not copper then return end
+	if not gold and not silver and not copper and not percent then return end
 
 	value = gsub(value, '%d*%.?%d+g', '', 1)
 	value = gsub(value, '%d*%.?%d+s', '', 1)
 	value = gsub(value, '%d*%.?%d+c', '', 1)
-	if strfind(value, '%S') then return end
+	value = gsub(value, '%d*%.?%d+%%', '', 1)
 
-	return from_gsc(gold or 0, silver or 0, copper or 0)
+	if strfind(value, '%S') then return end
+	
+	if percent and item_id then
+		percent = percent * history.value(item_id) / 100
+	elseif percent then
+		print("item_id is missing for percent pricing, this is a bug")
+		percent=0
+	else	
+		percent=0
+	end
+	
+	return max(from_gsc(gold or 0, silver or 0, copper or 0, percent or 0),percent)
 end
 
 function M.format_number(num, pad, color)

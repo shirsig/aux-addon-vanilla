@@ -183,10 +183,19 @@ end
 function price_update()
     if selected_item then
         local historical_value = history.value(selected_item.key)
-        if get_bid_selection() or get_buyout_selection() then
-	        set_unit_start_price(undercut(get_bid_selection() or get_buyout_selection(), stack_size_slider:GetValue(), get_bid_selection()))
-	        unit_start_price_input:SetText(money.to_string(get_unit_start_price(), true, nil, nil, true))
-        end
+        
+		--in post bid mode only adjsut bid price when clickinga buyout to undercut
+		if aux.account_data.post_bid then
+			if get_bid_selection() then
+				set_unit_start_price(undercut(get_bid_selection(), stack_size_slider:GetValue(), get_bid_selection()))
+				unit_start_price_input:SetText(money.to_string(get_unit_start_price(), true, nil, nil, true))
+			end
+		else -- when not in post bid mode then seth both bid and buyout
+			if get_bid_selection() or get_buyout_selection() then
+				set_unit_start_price(undercut(get_bid_selection() or get_buyout_selection(), stack_size_slider:GetValue(), get_bid_selection()))
+				unit_start_price_input:SetText(money.to_string(get_unit_start_price(), true, nil, nil, true))
+			end
+		end
         if get_buyout_selection() then
 	        set_unit_buyout_price(undercut(get_buyout_selection(), stack_size_slider:GetValue()))
 	        unit_buyout_price_input:SetText(money.to_string(get_unit_buyout_price(), true, nil, nil, true))

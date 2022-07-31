@@ -250,7 +250,7 @@ do
 	    end
     end)
     editbox.formatter = function() return money.to_string(get_unit_start_price(), true) end
-    editbox.char = function() set_bid_selection(); set_buyout_selection(); set_unit_start_price(money.from_string(this:GetText())) end
+    editbox.char = function() set_bid_selection(); set_buyout_selection(); set_unit_start_price(money.from_string(this:GetText(),selected_item.key)) end
     editbox.change = function() refresh = true end
     editbox.enter = function() this:ClearFocus() end
     editbox.focus_loss = function()
@@ -285,7 +285,7 @@ do
         end
     end)
     editbox.formatter = function() return money.to_string(get_unit_buyout_price(), true) end
-    editbox.char = function() set_buyout_selection(); set_unit_buyout_price(money.from_string(this:GetText())) end
+    editbox.char = function() set_buyout_selection(); set_unit_buyout_price(money.from_string(this:GetText(),selected_item.key)) end
     editbox.change = function() refresh = true end
     editbox.enter = function() this:ClearFocus() end
     editbox.focus_loss = function()
