@@ -93,7 +93,7 @@ end
 
 function handle.LOAD2()
     local key = format('%s|%s', GetCVar'realmName', UnitFactionGroup'player')
-	if GetCVar'realmName' == 'Turtle WoW' then
+	if GetCVar'realmName' == 'Nordanaar' then
 		key = format('%s|%s', GetCVar'realmName', 'Horde')
 	end
     aux.faction[key] = aux.faction[key] or {}
